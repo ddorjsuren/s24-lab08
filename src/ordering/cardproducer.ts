@@ -22,7 +22,7 @@ interface CardDeck {
  * @param cardOrganizer The (potentially composite) {@link CardOrganizer} instance to sort and filter the cards with
  *                      based on the correctness of responses.
  */
-function newCardDeck (cards: FlashCard[], cardOrganizer: CardOrganizer): CardDeck {
+function newCardDeck (cards: FlashCard[], cardOrganizer: CardOrganizer, repetitions?: number): CardDeck {
   let status: CardStatus[] = cards.map(newCardStatus)
 
   return {
