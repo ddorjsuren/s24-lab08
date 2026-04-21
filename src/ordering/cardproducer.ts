@@ -1,6 +1,7 @@
 import { FlashCard } from '../cards/flashcard.js'
-import { CardOrganizer } from './cardorganizer.js'
+import { CardOrganizer, newCombinedCardOrganizer } from './cardorganizer.js'
 import { CardStatus, newCardStatus } from '../cards/cardstatus.js'
+import { newNonRepeatingCardOrganizer, newRepeatingCardOrganizer } from './repetition/cardrepeater.js'
 
 /**
  * A card deck represents a set of cards in a specific order with associated state and a mechanism to filter and reorder
@@ -23,6 +24,10 @@ interface CardDeck {
  *                      based on the correctness of responses.
  */
 function newCardDeck (cards: FlashCard[], cardOrganizer: CardOrganizer, repetitions?: number): CardDeck {
+  const repeater = repetitions !== undefined
+    ? newRepeatingCardOrganizer(repetitions)
+    : newNonRepeatingCardOrganizer()
+  const combinedOrganizer = newCombinedCardOrganizer([cardOrganizer, repeater])  // ← compose
   let status: CardStatus[] = cards.map(newCardStatus)
 
   return {
