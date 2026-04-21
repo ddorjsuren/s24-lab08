@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Fix lint
+        run: npx ts-standard --fix src/
+
       - name: Lint
         run: npm run lint
 
