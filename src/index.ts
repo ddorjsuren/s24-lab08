@@ -1,6 +1,5 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-
 import { loadCards } from './data/store.js'
 import { newCardDeck } from './ordering/cardproducer.js'
 import { newMostMistakesFirstSorter } from './ordering/prioritization/mostmistakes.js'
@@ -10,8 +9,7 @@ import { newUI } from './ui.js'
 import { CardOrganizer } from './ordering/cardorganizer.js'
 
 // CLI
-
-type CLIArgs = {
+interface CLIArgs {
   cardsFile: string
   order: 'random' | 'worst-first' | 'recent-mistakes-first'
   repetitions?: number
@@ -56,13 +54,13 @@ const argv = yargs(hideBin(process.argv))
   .strict()
   .parseSync()
 
-//  LOAD CARDS 
+// LOAD CARDS
 let store
 try {
   const cardsFile = argv.cardsFile as string
   store = loadCards(cardsFile)
 } catch (err) {
-  console.error(`Error: Failed to load cards from file "${argv.cardsFile}"`)
+  console.error(`Error: Failed to load cards from file "${String(argv.cardsFile)}"`)
   process.exit(1)
 }
 
@@ -71,9 +69,8 @@ if (argv.invertCards) {
   store = store.invertCards()
 }
 
-//  ORGANIZER 
+// ORGANIZER
 let organizer: CardOrganizer
-
 switch (argv.order) {
   case 'worst-first':
     organizer = newMostMistakesFirstSorter()
@@ -86,12 +83,12 @@ switch (argv.order) {
     organizer = newCardShuffler()
 }
 
-//  DECK 
+// DECK
 const deck = newCardDeck(
   store.getAllCards(),
   organizer,
   argv.repetitions
 )
 
-//  RUN 
+// RUN
 newUI().studyCards(deck)
