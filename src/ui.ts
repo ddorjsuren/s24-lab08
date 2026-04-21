@@ -1,5 +1,6 @@
 import { FlashCard } from './cards/flashcard.js'
 import { CardDeck } from './ordering/cardproducer.js'
+import { checkAchievements } from './achievements/achievementchecker.js'
 import readline from 'readline-sync'
 
 interface UI {
@@ -7,12 +8,16 @@ interface UI {
 };
 
 function newUI (): UI {
-  function cueAllCards (producer: CardDeck): void {
+  function cueAllCards (producer: CardDeck): number[] {
+    const timingsMs: number[] = []
     for (const cardStatus of producer.getCards()) {
       const card = cardStatus.getCard()
+      const start = Date.now()
       const correctAnswer = cueCard(card)
+      timingsMs.push(Date.now() - start)
       cardStatus.recordResult(correctAnswer)
     }
+    return timingsMs
   };
 
   function cueCard (card: FlashCard): boolean {
@@ -28,23 +33,31 @@ function newUI (): UI {
     return success
   };
 
-  return {
+  function displayAchievements (producer: CardDeck, timingsMs: number[]): void {
+    const earned = checkAchievements(producer.getCards(), timingsMs)
+    if (earned.length > 0) {
+      console.log('\nAchievements earned this round:')
+      for (const achievement of earned) {
+        console.log(` ${achievement.getType()}: ${achievement.getDescription()}`)
+      }
+    }
+  };
 
+  return {
     /**
      * Prompts the user with {@link FlashCard} cards until the {@link CardProducer} is exhausted.
-     * @param cardProducer The {@link CardProducer} to use for organizing cards.
-     * @param learnTitles Whether to prompt with definitions and require the user to provide titles.
+     * @param producer The {@link CardDeck} to use for organizing cards.
      */
     studyCards (producer: CardDeck): void {
       while (!producer.isComplete()) {
         console.log(`${producer.countCards()} cards to go...`)
-        cueAllCards(producer)
+        const timingsMs = cueAllCards(producer)
+        displayAchievements(producer, timingsMs)
         console.log('Reached the end of the card deck, reorganizing...')
         producer.reorganize()
       };
       console.log('Finished all cards. Yay.')
     }
-
   }
 };
 
