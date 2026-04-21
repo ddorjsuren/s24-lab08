@@ -31,16 +31,10 @@ function newRecentMistakesFirstSorter (): CardOrganizer {
           const aMistake = getMostRecentMistakeIndex(a.card)
           const bMistake = getMostRecentMistakeIndex(b.card)
 
-          // Cards with no mistakes go last
           if (aMistake === -1 && bMistake === -1) return 0
           if (aMistake === -1) return 1
           if (bMistake === -1) return -1
-
-          // Different rounds: more recent round comes first
           if (bMistake !== aMistake) return bMistake - aMistake
-
-          // Same round: card answered later in the deck (higher position) was
-          // most recently seen, so it comes first
           return b.deckPosition - a.deckPosition
         })
         .map(({ card }) => card)
