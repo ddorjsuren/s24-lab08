@@ -22,14 +22,14 @@ interface CardDeck {
  *                      a {@link CardStatus}.
  * @param cardOrganizer The (potentially composite) {@link CardOrganizer} instance to sort and filter the cards with
  *                      based on the correctness of responses.
+ * @param repetitions   The number of correct answers required per card before it is removed from the deck.
  */
 function newCardDeck (cards: FlashCard[], cardOrganizer: CardOrganizer, repetitions?: number): CardDeck {
   const repeater = repetitions !== undefined
     ? newRepeatingCardOrganizer(repetitions)
     : newNonRepeatingCardOrganizer()
-  const combinedOrganizer = newCombinedCardOrganizer([cardOrganizer, repeater])  // ← compose
+  const combinedOrganizer = newCombinedCardOrganizer([cardOrganizer, repeater])
   let status: CardStatus[] = cards.map(newCardStatus)
-
   return {
     /**
      * Retrieves the remaining stored cards.
@@ -45,17 +45,14 @@ function newCardDeck (cards: FlashCard[], cardOrganizer: CardOrganizer, repetiti
      * @return The {@link CardOrganizer} used to sort this deck.
      */
     getOrganizer: function (): CardOrganizer {
-      return cardOrganizer
+      return combinedOrganizer
     },
     /**
      * A helper method, that calls {@link CardOrganizer#reorganize(List)} with the global cards field and overwrites
      * it with the result.
-     *
-     * @return The final, filtered and ordered list of cards.
      */
     reorganize: function () {
-      status = cardOrganizer.reorganize(status)
-      return status
+      status = combinedOrganizer.reorganize(status)
     },
     /**
      * Checks whether any more cards need to be tested.
@@ -73,7 +70,6 @@ function newCardDeck (cards: FlashCard[], cardOrganizer: CardOrganizer, repetiti
     countCards: function () {
       return status.length
     }
-
   }
 };
 
