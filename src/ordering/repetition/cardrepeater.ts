@@ -36,7 +36,7 @@ function newNonRepeatingCardOrganizer (): CardOrganizer {
    */
   function anyAnswer (card: CardStatus): boolean {
     // Completion is marked by having been answered at least once, regardless of the correctness of that response.
-    return card.getResults().length > 0
+    return card.getResults().filter((c)=>c).length >= 1
   };
 
   return newCardRepeater(anyAnswer)
